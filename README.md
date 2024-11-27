@@ -112,6 +112,7 @@ module "tcp" {
 | <a name="input_asg_name"></a> [asg\_name](#input\_asg\_name) | Autoscaling group name, if provided. | `string` | `null` | no |
 | <a name="input_asg_scale_in_protected_instances"></a> [asg\_scale\_in\_protected\_instances](#input\_asg\_scale\_in\_protected\_instances) | Behavior when encountering instances protected from scale in are found. Available behaviors are Refresh, Ignore, and Wait. | `string` | `"Ignore"` | no |
 | <a name="input_assume_dns"></a> [assume\_dns](#input\_assume\_dns) | If True, create DNS records provided by var.dns\_a\_records. | `bool` | `true` | no |
+| <a name="input_attach_tagret_group_to_asg"></a> [attach\_tagret\_group\_to\_asg](#input\_attach\_tagret\_group\_to\_asg) | By default we want to register all ASG instances in the target group. However ECS registers targets itself. Disable it if using website-pod for ECS. | `bool` | `true` | no |
 | <a name="input_autoscaling_target_cpu_load"></a> [autoscaling\_target\_cpu\_load](#input\_autoscaling\_target\_cpu\_load) | Target CPU load for autoscaling | `number` | `60` | no |
 | <a name="input_backend_subnets"></a> [backend\_subnets](#input\_backend\_subnets) | Subnet ids where EC2 instances should be present | `list(string)` | n/a | yes |
 | <a name="input_dns_a_records"></a> [dns\_a\_records](#input\_dns\_a\_records) | List of A records in the zone\_id that will resolve to the nlb dns name. | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
