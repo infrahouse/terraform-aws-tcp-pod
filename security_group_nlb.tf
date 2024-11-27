@@ -11,21 +11,6 @@ resource "aws_security_group" "nlb" {
   )
 }
 
-resource "aws_vpc_security_group_ingress_rule" "nlb_listener_port" {
-  description       = "User traffic to port ${var.nlb_listener_port}"
-  security_group_id = aws_security_group.nlb.id
-  from_port         = var.nlb_listener_port
-  to_port           = var.nlb_listener_port
-  ip_protocol       = "tcp"
-  cidr_ipv4         = "0.0.0.0/0"
-  tags = merge(
-    {
-      Name = "user traffic"
-    },
-    local.default_module_tags
-  )
-}
-
 resource "aws_vpc_security_group_ingress_rule" "tcp" {
   description       = "User traffic to TCP port"
   security_group_id = aws_security_group.nlb.id
