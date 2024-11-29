@@ -1,15 +1,3 @@
-variable "nlb_access_log_enabled" {
-  description = "Whether to maintain the access log."
-  type        = bool
-  default     = false
-}
-
-variable "nlb_access_log_force_destroy" {
-  description = "Destroy S3 bucket with access logs even if non-empty"
-  type        = bool
-  default     = false
-}
-
 variable "nlb_healthcheck_enabled" {
   description = "Whether health checks are enabled."
   type        = bool
@@ -276,12 +264,6 @@ variable "ssh_cidr_block" {
 variable "subnets" {
   description = "Subnet ids where load balancer should be present"
   type        = list(string)
-}
-
-variable "stickiness_enabled" {
-  description = "If true, enable stickiness on the target group ensuring a clients is forwarded to the same target."
-  type        = bool
-  default     = false
 }
 
 variable "tags" {

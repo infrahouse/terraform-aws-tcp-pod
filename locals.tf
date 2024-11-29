@@ -12,10 +12,6 @@ locals {
     },
     local.default_module_tags
   )
-  access_log_tags = var.nlb_access_log_enabled ? {
-    access_log_bucket : aws_s3_bucket.access_log[0].bucket
-    access_log_bucket_policy : aws_s3_bucket_policy.access_logs[0].id
-  } : {}
   min_elb_capacity = var.asg_min_elb_capacity != null ? var.asg_min_elb_capacity : var.asg_min_size
   # See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
   elb_account_map = {

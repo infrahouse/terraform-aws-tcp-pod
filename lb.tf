@@ -9,13 +9,6 @@ resource "aws_lb" "tcp" {
     aws_security_group.nlb.id
   ]
 
-  dynamic "access_logs" {
-    for_each = var.nlb_access_log_enabled ? [{}] : []
-    content {
-      bucket  = aws_s3_bucket.access_log[0].bucket
-      enabled = var.nlb_access_log_enabled
-    }
-  }
   tags = merge(
     local.default_module_tags,
     local.access_log_tags
