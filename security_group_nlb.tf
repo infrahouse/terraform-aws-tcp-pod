@@ -1,8 +1,7 @@
 resource "aws_security_group" "nlb" {
   description = "Load balancer security group for service ${var.service_name}"
-  name_prefix = "web-"
+  name_prefix = "${var.service_name}-"
   vpc_id      = data.aws_subnet.selected.vpc_id
-
   tags = merge(
     {
       Name : "${var.service_name} load balancer"

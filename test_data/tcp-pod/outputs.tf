@@ -21,3 +21,8 @@ output "instance_profile_name" {
 output "load_balancer_dns_name" {
   value = module.lb.load_balancer_dns_name
 }
+
+output "ssh_private_key" {
+  value     = tls_private_key.rsa.private_key_openssh
+  sensitive = true
+}

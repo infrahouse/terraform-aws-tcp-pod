@@ -1,5 +1,5 @@
 resource "aws_lb" "tcp" {
-  name_prefix                = var.nlb_name_prefix
+  name_prefix                = local.nlb_name_prefix
   enable_deletion_protection = var.enable_deletion_protection
   subnets                    = var.subnets
   idle_timeout               = var.nlb_idle_timeout
@@ -8,11 +8,12 @@ resource "aws_lb" "tcp" {
   security_groups = [
     aws_security_group.nlb.id
   ]
-
   tags = merge(
     local.default_module_tags,
-    local.access_log_tags
   )
+  depends_on = [
+    aws_security_group.backend
+  ]
 }
 
 resource "aws_lb_listener" "tcp" {
@@ -26,14 +27,17 @@ resource "aws_lb_listener" "tcp" {
 }
 
 resource "aws_lb_target_group" "tcp" {
-  port        = var.target_group_port
+  name_prefix = local.nlb_name_prefix
+  port        = var.target_group_port != null ? var.target_group_port : var.nlb_listener_port
   protocol    = "TCP"
   target_type = var.target_group_type
   vpc_id      = data.aws_subnet.selected.vpc_id
+  stickiness {
+    type = "source_ip"
+  }
 
   health_check {
-    enabled             = var.nlb_healthcheck_enabled
-    path                = var.nlb_healthcheck_path
+    enabled             = true
     port                = var.nlb_healthcheck_port
     protocol            = var.nlb_healthcheck_protocol
     healthy_threshold   = var.nlb_healthcheck_healthy_threshold

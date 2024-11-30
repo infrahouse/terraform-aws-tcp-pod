@@ -1,8 +1,8 @@
 resource "aws_autoscaling_group" "tcp" {
   name                      = var.asg_name
   name_prefix               = var.asg_name == null ? aws_launch_template.tcp.name_prefix : null
-  min_size                  = var.asg_min_size
-  max_size                  = var.asg_max_size
+  min_size                  = local.asg_min_size
+  max_size                  = var.asg_max_size != null ? var.asg_max_size : length(var.backend_subnets) + 1
   min_elb_capacity          = local.min_elb_capacity
   vpc_zone_identifier       = var.backend_subnets
   health_check_type         = var.health_check_type
@@ -10,7 +10,7 @@ resource "aws_autoscaling_group" "tcp" {
   max_instance_lifetime     = var.max_instance_lifetime_days * 24 * 3600
   health_check_grace_period = var.health_check_grace_period
   protect_from_scale_in     = var.protect_from_scale_in
-  target_group_arns         = var.target_group_type == "instance" && var.attach_tagret_group_to_asg ? [aws_lb_target_group.tcp.arn] : []
+  target_group_arns         = var.target_group_type == "instance" ? [aws_lb_target_group.tcp.arn] : null
   instance_refresh {
     strategy = "Rolling"
     preferences {
@@ -28,11 +28,7 @@ resource "aws_autoscaling_group" "tcp" {
     max_healthy_percentage = var.asg_max_healthy_percentage
   }
   dynamic "tag" {
-    for_each = merge(
-      local.default_asg_tags,
-      var.tags,
-      data.aws_default_tags.provider.tags
-    )
+    for_each = local.default_asg_tags
     content {
       key                 = tag.key
       value               = tag.value
@@ -40,19 +36,21 @@ resource "aws_autoscaling_group" "tcp" {
 
     }
   }
-
   lifecycle {
     create_before_destroy = true
   }
+  depends_on = [
+    aws_security_group.backend
+  ]
 }
 
 resource "aws_launch_template" "tcp" {
   name          = var.asg_name
-  name_prefix   = var.asg_name == null ? var.nlb_name_prefix : null
+  name_prefix   = var.asg_name == null ? local.nlb_name_prefix : null
   image_id      = var.ami
   instance_type = var.instance_type
   user_data     = var.userdata
-  key_name      = var.key_pair_name
+  key_name      = var.key_pair_name != null ? var.key_pair_name : aws_key_pair.default.key_name
   vpc_security_group_ids = concat(
     [aws_security_group.backend.id],
     var.extra_security_groups_backend
@@ -84,7 +82,6 @@ resource "aws_launch_template" "tcp" {
       local.default_module_tags
     )
   }
-
   lifecycle {
     create_before_destroy = true
   }

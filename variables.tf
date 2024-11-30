@@ -1,30 +1,19 @@
-variable "nlb_healthcheck_enabled" {
-  description = "Whether health checks are enabled."
-  type        = bool
-  default     = true
-}
-variable "nlb_healthcheck_path" {
-  description = "Path on the webserver that the elb will check to determine whether the instance is healthy or not"
-  type        = string
-  default     = "/index.html"
-}
-
 variable "nlb_healthcheck_port" {
   description = "Port of the webserver that the elb will check to determine whether the instance is healthy or not"
   type        = any
-  default     = 80
+  default     = null
 }
 
 variable "nlb_healthcheck_protocol" {
   description = "Protocol to use with the webserver that the elb will check to determine whether the instance is healthy or not"
   type        = string
-  default     = "HTTP"
+  default     = "TCP"
 }
 
 variable "nlb_healthcheck_healthy_threshold" {
   description = "Number of times the host have to pass the test to be considered healthy"
   type        = number
-  default     = 2
+  default     = 5
 }
 
 variable "nlb_healthcheck_uhealthy_threshold" {
@@ -36,19 +25,19 @@ variable "nlb_healthcheck_uhealthy_threshold" {
 variable "nlb_healthcheck_interval" {
   description = "Number of seconds between checks"
   type        = number
-  default     = 5
+  default     = 30
 }
 
 variable "nlb_healthcheck_timeout" {
   description = "Number of seconds to timeout a check"
   type        = number
-  default     = 4
+  default     = 10
 }
 
 variable "nlb_healthcheck_response_code_matcher" {
   description = "Range of http return codes that can match"
   type        = string
-  default     = "200-299"
+  default     = null
 }
 
 variable "nlb_idle_timeout" {
@@ -65,18 +54,12 @@ variable "nlb_listener_port" {
 variable "nlb_name_prefix" {
   description = "Name prefix for the load balancer"
   type        = string
-  default     = "web"
+  default     = null
 }
 
 variable "ami" {
   description = "Image for EC2 instances"
   type        = string
-}
-
-variable "assume_dns" {
-  description = "If True, create DNS records provided by var.dns_a_records."
-  type        = bool
-  default     = true
 }
 
 variable "min_healthy_percentage" {
@@ -103,24 +86,24 @@ variable "asg_lifecycle_hook_heartbeat_timeout" {
   default     = 3600
 }
 
-
 variable "asg_min_elb_capacity" {
-  description = "Terraform will wait until this many EC2 instances in the autoscaling group become healthy. By default, it's equal to var.asg_min_size."
+  description = "Terraform will wait until this many EC2 instances in the autoscaling group become healthy. By default, it's equal to number of backend subnets."
   type        = number
   default     = null
 }
 
 variable "asg_min_size" {
-  description = "Minimum number of instances in ASG"
+  description = "Minimum number of instances in ASG. By default, the number of backend subnets."
   type        = number
-  default     = 2
+  default     = null
 }
 
 variable "asg_max_size" {
-  description = "Maximum number of instances in ASG"
+  description = "Maximum number of instances in ASG. By default, the number of backend subnets plus one."
   type        = number
-  default     = 10
+  default     = null
 }
+
 variable "asg_min_healthy_percentage" {
   description = "Specifies the lower limit on the number of instances that must be in the InService state with a healthy status during an instance replacement activity."
   type        = number
@@ -148,8 +131,8 @@ variable "asg_scale_in_protected_instances" {
 
 variable "autoscaling_target_cpu_load" {
   description = "Target CPU load for autoscaling"
-  default     = 60
   type        = number
+  default     = 60
 }
 
 variable "backend_subnets" {
@@ -166,9 +149,9 @@ variable "backend_subnets" {
 # If we pass A records as ["something"] then the module
 # will create the "A" record something.infrahouse.com
 variable "dns_a_records" {
-  description = "List of A records in the zone_id that will resolve to the nlb dns name."
+  description = "List of A records in the zone_id that will resolve to the nlb dns name. By default, the module will create one record <service_name>.<zone_name>."
   type        = list(string)
-  default     = [""]
+  default     = null
 }
 
 variable "enable_deletion_protection" {
@@ -208,15 +191,10 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
-variable "internet_gateway_id" { # tflint-ignore: terraform_unused_declarations
-  description = "Not used, but AWS Internet Gateway must be present. Ensure by passing its id."
-  type        = string
-}
-
 variable "health_check_grace_period" {
-  description = "ASG will wait up to this number of seconds for instance to become healthy"
+  description = "ASG will wait up to this number of seconds for instance to become healthy."
   type        = number
-  default     = 600
+  default     = 900
 }
 
 variable "health_check_type" {
@@ -224,11 +202,11 @@ variable "health_check_type" {
   # https://stackoverflow.com/questions/42466157/whats-the-difference-between-elb-health-check-and-ec2-health-check
   description = "Type of healthcheck the ASG uses. Can be EC2 or ELB."
   type        = string
-  default     = "ELB"
+  default     = "EC2"
 }
 
 variable "key_pair_name" {
-  description = "SSH keypair name to be deployed in EC2 instances"
+  description = "SSH keypair name to be deployed in EC2 instances."
   type        = string
 }
 
@@ -245,14 +223,13 @@ variable "protect_from_scale_in" {
 }
 
 variable "root_volume_size" {
-  description = "Root volume size in EC2 instance in Gigabytes"
+  description = "Root volume size in EC2 instance in Gigabytes."
   type        = number
   default     = 30
 }
 variable "service_name" {
-  description = "Descriptive name of a service that will use this VPC"
+  description = "Descriptive name of a service that will use this VPC."
   type        = string
-  default     = "tcp"
 }
 
 variable "ssh_cidr_block" {
@@ -269,15 +246,13 @@ variable "subnets" {
 variable "tags" {
   description = "Tags to apply to instances in the autoscaling group."
   type        = map(string)
-  default = {
-    Name : "webserver"
-  }
+  default     = {}
 }
 
 variable "target_group_port" {
-  description = "TCP port that a target listens to to serve requests from the load balancer."
+  description = "TCP port that a target listens to to serve requests from the load balancer. By default, the NLB listener port."
   type        = number
-  default     = 80
+  default     = null
 }
 
 variable "target_group_type" {
@@ -300,10 +275,4 @@ variable "wait_for_capacity_timeout" {
 variable "zone_id" {
   description = "Domain name zone ID where the website will be available"
   type        = string
-}
-
-variable "attach_tagret_group_to_asg" {
-  description = "By default we want to register all ASG instances in the target group. However ECS registers targets itself. Disable it if using website-pod for ECS."
-  type        = bool
-  default     = true
 }

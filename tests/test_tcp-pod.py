@@ -1,11 +1,12 @@
 import json
 from pprint import pformat
 from os import path as osp
+from tempfile import NamedTemporaryFile
 from textwrap import dedent
 
 import pytest
-import requests
 from infrahouse_toolkit.terraform import terraform_apply
+from paramiko.client import SSHClient, WarningPolicy, AutoAddPolicy
 
 from tests.conftest import (
     LOG,
@@ -24,7 +25,7 @@ from tests.conftest import (
     "lb_subnets,expected_scheme",
     [("subnet_public_ids", "internet-facing"), ("subnet_private_ids", "internal")],
 )
-def test_lb(
+def test_module(
     service_network,
     ec2_client,
     route53_client,
@@ -35,12 +36,11 @@ def test_lb(
     keep_after,
 ):
     subnet_private_ids = service_network["subnet_private_ids"]["value"]
-    internet_gateway_id = service_network["internet_gateway_id"]["value"]
     lb_subnet_ids = service_network[lb_subnets]["value"]
 
-    terraform_dir = "test_data/test_create_lb"
+    terraform_dir = "test_data/tcp-pod"
+    instance_name = "jumphost"
 
-    instance_name = "foo-app"
     with open(osp.join(terraform_dir, "terraform.tfvars"), "w") as fp:
         fp.write(
             dedent(
@@ -49,13 +49,9 @@ def test_lb(
                 dns_zone        = "{TEST_ZONE}"
                 ubuntu_codename = "{UBUNTU_CODENAME}"
                 role_arn        = "{TEST_ROLE_ARN}"
-                tags = {{
-                    Name: "{instance_name}"
-                }}
 
                 lb_subnet_ids       = {json.dumps(lb_subnet_ids)}
                 backend_subnet_ids  = {json.dumps(subnet_private_ids)}
-                internet_gateway_id = "{internet_gateway_id}"
                 """
             )
         )
@@ -84,13 +80,7 @@ def test_lb(
             for a in response["ResourceRecordSets"]
             if a["Type"] in ["CNAME", "A"]
         ]
-        assert f"{TEST_ZONE}." in records, "Record %s is missing in %s: %s" % (
-            TEST_ZONE,
-            TEST_ZONE,
-            pformat(records, indent=4),
-        )
-
-        for record in ["bogus-test-stuff", "www"]:
+        for record in ["jumphost"]:
             assert (
                 "%s.%s." % (record, TEST_ZONE) in records
             ), "Record %s is missing in %s: %s" % (
@@ -98,14 +88,6 @@ def test_lb(
                 TEST_ZONE,
                 pformat(records, indent=4),
             )
-
-        response = ec2_client.describe_vpcs(
-            Filters=[{"Name": "cidr", "Values": ["10.1.0.0/16"]}],
-        )
-        # Check VPC is created
-        assert len(response["Vpcs"]) == 1, "Unexpected number of VPC: %s" % pformat(
-            response, indent=4
-        )
 
         response = elbv2_client.describe_load_balancers()
         LOG.debug("describe_load_balancers(): %s", pformat(response, indent=4))
@@ -124,13 +106,13 @@ def test_lb(
         )
         LOG.debug("describe_listeners(%s): %s", lb_arn, pformat(response, indent=4))
         assert (
-            len(response["Listeners"]) == 2
+            len(response["Listeners"]) == 1
         ), "Unexpected number of listeners: %s" % pformat(response, indent=4)
 
-        ssl_listeners = [
-            listener for listener in response["Listeners"] if listener["Port"] == 443
+        tcp_listeners = [
+            listener for listener in response["Listeners"] if listener["Port"] == 22
         ]
-        listener = ssl_listeners[0]
+        listener = tcp_listeners[0]
         response = elbv2_client.describe_rules(
             ListenerArn=listener["ListenerArn"],
         )
@@ -152,23 +134,23 @@ def test_lb(
         for thd in response["TargetHealthDescriptions"]:
             if thd["TargetHealth"]["State"] == "healthy":
                 healthy_count += 1
-        assert healthy_count == 3
+        assert healthy_count >= len(subnet_private_ids)
 
+        assert len(tf_output["network_subnet_private_ids"]) == 3
         if expected_scheme == "internet-facing":
-            for a_rec in ["bogus-test-stuff", "www"]:
-                response = requests.get("https://%s.%s" % (a_rec, TEST_ZONE))
-                assert all(
-                    (
-                        response.status_code == 200,
-                        response.text == "Success Message\r\n",
-                    )
-                ), (
-                    "Unsuccessful HTTP response: %s" % response.text
+            with NamedTemporaryFile("w") as ssh_key_file:
+                ssh_key_file.write(tf_output["ssh_private_key"]["value"])
+                ssh_key_file.flush()
+
+                client = SSHClient()
+                client.set_missing_host_key_policy(AutoAddPolicy())
+                client.connect(
+                    f"jumphost.{TEST_ZONE}",
+                    username="ubuntu",
+                    key_filename=ssh_key_file.name,
                 )
-            response = requests.get(
-                f"https://{tf_output['load_balancer_dns_name']['value']}", verify=False
-            )
-            assert response.status_code == 400
+                stdin, stdout, stderr = client.exec_command("echo success")
+                assert stdout.read().decode().strip() == "success"
 
         # Check tags on ASG instances
         asg_name = tf_output["asg_name"]["value"]

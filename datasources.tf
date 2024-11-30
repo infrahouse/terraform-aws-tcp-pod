@@ -6,7 +6,7 @@ data "aws_subnet" "selected" {
   id = var.subnets[0]
 }
 
-data "aws_route53_zone" "webserver_zone" {
+data "aws_route53_zone" "selected" {
   provider = aws.dns
   zone_id  = var.zone_id
 }
@@ -33,5 +33,4 @@ data "aws_iam_policy_document" "default_permissions" {
       "*"
     ]
   }
-
 }
