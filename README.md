@@ -27,12 +27,12 @@ module "tcp" {
   backend_subnets       = module.website-vpc.subnet_private_ids
   zone_id               = "Z07662251LH3YRF2ERM3G"
   dns_a_records         = ["", "www"]
-  internet_gateway_id   = module.website-vpc.internet_gateway_id
   key_pair_name         = data.aws_key_pair.aleks.key_name
   subnets               = module.website-vpc.subnet_public_ids
   userdata              = module.webserver_userdata.userdata
 }
 ```
+
 ## Requirements
 
 | Name | Version |
@@ -107,6 +107,7 @@ module "tcp" {
 | <a name="input_asg_min_size"></a> [asg\_min\_size](#input\_asg\_min\_size) | Minimum number of instances in ASG. By default, the number of backend subnets. | `number` | `null` | no |
 | <a name="input_asg_name"></a> [asg\_name](#input\_asg\_name) | Autoscaling group name, if provided. | `string` | `null` | no |
 | <a name="input_asg_scale_in_protected_instances"></a> [asg\_scale\_in\_protected\_instances](#input\_asg\_scale\_in\_protected\_instances) | Behavior when encountering instances protected from scale in are found. Available behaviors are Refresh, Ignore, and Wait. | `string` | `"Ignore"` | no |
+| <a name="input_attach_target_group_to_asg"></a> [attach\_target\_group\_to\_asg](#input\_attach\_target\_group\_to\_asg) | By default we want to register all ASG instances in the target group. However ECS registers targets itself. Disable it if using website-pod for ECS. | `bool` | `true` | no |
 | <a name="input_autoscaling_target_cpu_load"></a> [autoscaling\_target\_cpu\_load](#input\_autoscaling\_target\_cpu\_load) | Target CPU load for autoscaling | `number` | `60` | no |
 | <a name="input_backend_subnets"></a> [backend\_subnets](#input\_backend\_subnets) | Subnet ids where EC2 instances should be present | `list(string)` | n/a | yes |
 | <a name="input_dns_a_records"></a> [dns\_a\_records](#input\_dns\_a\_records) | List of A records in the zone\_id that will resolve to the nlb dns name. By default, the module will create one record <service\_name>.<zone\_name>. | `list(string)` | `null` | no |
