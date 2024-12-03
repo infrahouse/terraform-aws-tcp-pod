@@ -44,7 +44,6 @@ resource "aws_lb_target_group" "tcp" {
     unhealthy_threshold = var.nlb_healthcheck_uhealthy_threshold
     interval            = var.nlb_healthcheck_interval
     timeout             = var.nlb_healthcheck_timeout
-    matcher             = var.nlb_healthcheck_response_code_matcher
   }
 
   tags = local.default_module_tags

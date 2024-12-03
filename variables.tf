@@ -34,12 +34,6 @@ variable "nlb_healthcheck_timeout" {
   default     = 10
 }
 
-variable "nlb_healthcheck_response_code_matcher" {
-  description = "Range of http return codes that can match"
-  type        = string
-  default     = null
-}
-
 variable "nlb_idle_timeout" {
   description = "The time in seconds that the connection is allowed to be idle."
   type        = number
