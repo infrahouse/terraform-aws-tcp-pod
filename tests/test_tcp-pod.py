@@ -11,7 +11,6 @@ from paramiko.client import SSHClient, AutoAddPolicy
 from tests.conftest import (
     LOG,
     TEST_ZONE,
-    REGION,
     UBUNTU_CODENAME,
     TEST_TIMEOUT,
     wait_for_instance_refresh,
@@ -32,6 +31,7 @@ def test_module(
     lb_subnets,
     expected_scheme,
     keep_after,
+    aws_region,
 ):
     subnet_private_ids = service_network["subnet_private_ids"]["value"]
     lb_subnet_ids = service_network[lb_subnets]["value"]
@@ -43,7 +43,7 @@ def test_module(
         fp.write(
             dedent(
                 f"""
-                region          = "{REGION}"
+                region          = "{aws_region}"
                 dns_zone        = "{TEST_ZONE}"
                 ubuntu_codename = "{UBUNTU_CODENAME}"
 

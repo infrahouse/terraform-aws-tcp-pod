@@ -1,5 +1,7 @@
 variable "region" {}
-variable "role_arn" {}
+variable "role_arn" {
+  default = null
+}
 variable "dns_zone" {}
 variable "ubuntu_codename" {}
 variable "asg_name" { default = null }

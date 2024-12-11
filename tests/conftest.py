@@ -10,7 +10,6 @@ TEST_TIMEOUT = 3600
 UBUNTU_CODENAME = "jammy"
 
 LOG = logging.getLogger(__name__)
-REGION = "us-east-2"
 TEST_ZONE = "ci-cd.infrahouse.com"
 TERRAFORM_ROOT_DIR = "test_data"
 
