@@ -13,8 +13,6 @@ from tests.conftest import (
     TEST_ZONE,
     REGION,
     UBUNTU_CODENAME,
-    TRACE_TERRAFORM,
-    TEST_ROLE_ARN,
     TEST_TIMEOUT,
     wait_for_instance_refresh,
 )
@@ -48,7 +46,6 @@ def test_module(
                 region          = "{REGION}"
                 dns_zone        = "{TEST_ZONE}"
                 ubuntu_codename = "{UBUNTU_CODENAME}"
-                role_arn        = "{TEST_ROLE_ARN}"
 
                 lb_subnet_ids       = {json.dumps(lb_subnet_ids)}
                 backend_subnet_ids  = {json.dumps(subnet_private_ids)}
@@ -60,7 +57,6 @@ def test_module(
         terraform_dir,
         destroy_after=not keep_after,
         json_output=True,
-        enable_trace=TRACE_TERRAFORM,
     ) as tf_output:
         assert len(tf_output["network_subnet_private_ids"]) == 3
         assert len(tf_output["network_subnet_public_ids"]) == 3
