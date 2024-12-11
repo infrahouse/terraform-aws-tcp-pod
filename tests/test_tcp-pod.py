@@ -6,15 +6,12 @@ from textwrap import dedent
 
 import pytest
 from infrahouse_toolkit.terraform import terraform_apply
-from paramiko.client import SSHClient, WarningPolicy, AutoAddPolicy
+from paramiko.client import SSHClient, AutoAddPolicy
 
 from tests.conftest import (
     LOG,
     TEST_ZONE,
-    REGION,
     UBUNTU_CODENAME,
-    TRACE_TERRAFORM,
-    TEST_ROLE_ARN,
     TEST_TIMEOUT,
     wait_for_instance_refresh,
 )
@@ -34,6 +31,7 @@ def test_module(
     lb_subnets,
     expected_scheme,
     keep_after,
+    aws_region,
 ):
     subnet_private_ids = service_network["subnet_private_ids"]["value"]
     lb_subnet_ids = service_network[lb_subnets]["value"]
@@ -45,10 +43,9 @@ def test_module(
         fp.write(
             dedent(
                 f"""
-                region          = "{REGION}"
+                region          = "{aws_region}"
                 dns_zone        = "{TEST_ZONE}"
                 ubuntu_codename = "{UBUNTU_CODENAME}"
-                role_arn        = "{TEST_ROLE_ARN}"
 
                 lb_subnet_ids       = {json.dumps(lb_subnet_ids)}
                 backend_subnet_ids  = {json.dumps(subnet_private_ids)}
@@ -60,7 +57,6 @@ def test_module(
         terraform_dir,
         destroy_after=not keep_after,
         json_output=True,
-        enable_trace=TRACE_TERRAFORM,
     ) as tf_output:
         assert len(tf_output["network_subnet_private_ids"]) == 3
         assert len(tf_output["network_subnet_public_ids"]) == 3
