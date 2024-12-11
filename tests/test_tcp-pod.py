@@ -6,7 +6,7 @@ from textwrap import dedent
 
 import pytest
 from infrahouse_toolkit.terraform import terraform_apply
-from paramiko.client import SSHClient, WarningPolicy, AutoAddPolicy
+from paramiko.client import SSHClient, AutoAddPolicy
 
 from tests.conftest import (
     LOG,
