@@ -8,6 +8,10 @@ resource "aws_key_pair" "default" {
   tags = merge(
     local.default_module_tags,
     {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    },
+    {
       in-use : var.key_pair_name == null
     }
   )

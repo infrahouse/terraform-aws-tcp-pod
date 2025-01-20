@@ -4,10 +4,14 @@ resource "aws_security_group" "backend" {
   vpc_id      = data.aws_subnet.selected.vpc_id
 
   tags = merge(
+    local.default_module_tags,
     {
       Name : "${var.service_name} backend"
     },
-    local.default_module_tags
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
 }
 
@@ -19,10 +23,14 @@ resource "aws_vpc_security_group_ingress_rule" "backend_ssh_local" {
   ip_protocol       = "tcp"
   cidr_ipv4         = data.aws_vpc.service.cidr_block
   tags = merge(
+    local.default_module_tags,
     {
       Name = "SSH local"
     },
-    local.default_module_tags
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
 }
 
@@ -35,10 +43,14 @@ resource "aws_vpc_security_group_ingress_rule" "backend_ssh_input" {
   ip_protocol       = "tcp"
   cidr_ipv4         = var.ssh_cidr_block
   tags = merge(
+    local.default_module_tags,
     {
       Name = "SSH additional"
     },
-    local.default_module_tags
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
 }
 
@@ -48,10 +60,14 @@ resource "aws_vpc_security_group_ingress_rule" "backend_user_traffic" {
   ip_protocol                  = "-1"
   referenced_security_group_id = aws_security_group.nlb.id
   tags = merge(
+    local.default_module_tags,
     {
       Name = "Load balancer traffic"
     },
-    local.default_module_tags
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
 }
 
@@ -65,10 +81,14 @@ resource "aws_vpc_security_group_ingress_rule" "backend_healthcheck" {
   ip_protocol       = "tcp"
   cidr_ipv4         = data.aws_vpc.service.cidr_block
   tags = merge(
+    local.default_module_tags,
     {
       Name = "healthcheck"
     },
-    local.default_module_tags
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
 }
 
@@ -80,10 +100,14 @@ resource "aws_vpc_security_group_ingress_rule" "backend_icmp" {
   ip_protocol       = "icmp"
   cidr_ipv4         = "0.0.0.0/0"
   tags = merge(
+    local.default_module_tags,
     {
       Name = "ICMP traffic"
     },
-    local.default_module_tags
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
 }
 
@@ -93,9 +117,13 @@ resource "aws_vpc_security_group_egress_rule" "backend_outgoing" {
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
   tags = merge(
+    local.default_module_tags,
     {
       Name = "outgoing traffic"
     },
-    local.default_module_tags
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
 }
