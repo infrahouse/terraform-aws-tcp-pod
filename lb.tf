@@ -10,6 +10,10 @@ resource "aws_lb" "tcp" {
   ]
   tags = merge(
     local.default_module_tags,
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
   )
   depends_on = [
     aws_security_group.backend
@@ -24,6 +28,13 @@ resource "aws_lb_listener" "tcp" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tcp.arn
   }
+  tags = merge(
+    local.default_module_tags,
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
+  )
 }
 
 resource "aws_lb_target_group" "tcp" {
@@ -46,5 +57,11 @@ resource "aws_lb_target_group" "tcp" {
     timeout             = var.nlb_healthcheck_timeout
   }
 
-  tags = local.default_module_tags
+  tags = merge(
+    local.default_module_tags,
+    {
+      VantaContainsUserData : false
+      VantaContainsEPHI : false
+    }
+  )
 }

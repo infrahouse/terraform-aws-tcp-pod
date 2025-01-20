@@ -79,7 +79,11 @@ resource "aws_launch_template" "tcp" {
     resource_type = "network-interface"
     tags = merge(
       data.aws_default_tags.provider.tags,
-      local.default_module_tags
+      local.default_module_tags,
+      {
+        VantaContainsUserData : false
+        VantaContainsEPHI : false
+      }
     )
   }
   lifecycle {
