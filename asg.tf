@@ -59,7 +59,8 @@ resource "aws_launch_template" "tcp" {
     arn = module.instance_profile.instance_profile_arn
   }
   metadata_options {
-    http_tokens = "required"
+    http_tokens   = "required"
+    http_endpoint = "enabled"
   }
   block_device_mappings {
     device_name = data.aws_ami.selected.root_device_name
