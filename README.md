@@ -132,6 +132,7 @@ module "tcp" {
 | <a name="input_nlb_idle_timeout"></a> [nlb\_idle\_timeout](#input\_nlb\_idle\_timeout) | The time in seconds that the connection is allowed to be idle. | `number` | `60` | no |
 | <a name="input_nlb_listener_port"></a> [nlb\_listener\_port](#input\_nlb\_listener\_port) | TCP port that a load balancer listens. | `number` | n/a | yes |
 | <a name="input_nlb_name_prefix"></a> [nlb\_name\_prefix](#input\_nlb\_name\_prefix) | Name prefix for the load balancer | `string` | `null` | no |
+| <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | If specified, the ASG will request spot instances and this will be the minimal number of on-demand instances. | `number` | `null` | no |
 | <a name="input_protect_from_scale_in"></a> [protect\_from\_scale\_in](#input\_protect\_from\_scale\_in) | Whether newly launched instances are automatically protected from termination by Amazon EC2 Auto Scaling when scaling in. | `bool` | `false` | no |
 | <a name="input_root_volume_size"></a> [root\_volume\_size](#input\_root\_volume\_size) | Root volume size in EC2 instance in Gigabytes. | `number` | `30` | no |
 | <a name="input_service_name"></a> [service\_name](#input\_service\_name) | Descriptive name of a service that will use this VPC. | `string` | n/a | yes |
