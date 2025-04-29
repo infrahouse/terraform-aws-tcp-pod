@@ -333,3 +333,9 @@ variable "sns_topic_alarm_arn" {
   type        = string
   default     = null
 }
+
+variable "on_demand_base_capacity" {
+  description = "If specified, the ASG will request spot instances and this will be the minimal number of on-demand instances."
+  type        = number
+  default     = null
+}
