@@ -3,7 +3,7 @@ locals {
 }
 module "jumphost-cloud-init" {
   source                   = "registry.infrahouse.com/infrahouse/cloud-init/aws"
-  version                  = "1.13.1"
+  version                  = "1.18.0"
   environment              = local.environment
   role                     = "jumphost"
   puppet_hiera_config_path = "/opt/infrahouse-puppet-data/environments/${local.environment}/hiera.yaml"
