@@ -3,7 +3,7 @@ from time import sleep
 
 import logging
 
-from infrahouse_toolkit.logging import setup_logging
+from infrahouse_core.logging import setup_logging
 
 DEFAULT_PROGRESS_INTERVAL = 10
 TEST_TIMEOUT = 3600
