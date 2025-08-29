@@ -339,9 +339,3 @@ variable "on_demand_base_capacity" {
   type        = number
   default     = null
 }
-
-variable "create_caa_records" {
-  description = "If True, create CAA records for AWS certificate authorities."
-  type        = bool
-  default     = true
-}

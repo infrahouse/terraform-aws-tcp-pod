@@ -74,7 +74,7 @@ def test_module(
         records = [
             a["Name"]
             for a in response["ResourceRecordSets"]
-            if a["Type"] in ["CNAME", "A"]
+            if a["Type"] in ["CNAME", "A", "CAA"]
         ]
         for record in ["jumphost"]:
             assert (
