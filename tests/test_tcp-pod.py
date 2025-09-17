@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 from textwrap import dedent
 
 import pytest
-from infrahouse_toolkit.terraform import terraform_apply
+from pytest_infrahouse import terraform_apply
 from paramiko.client import SSHClient, AutoAddPolicy
 
 from tests.conftest import (

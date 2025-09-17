@@ -1,10 +1,10 @@
 black ~= 24.4
 boto3 ~= 1.26
-infrahouse-toolkit ~= 2.0
+infrahouse-core ~= 0.17
 myst-parser ~= 2.0
 paramiko ~= 3.5
 pytest ~= 8.3
-pytest-infrahouse ~= 0.2
+pytest-infrahouse ~= 0.9
 pytest-timeout ~= 2.1
 pytest-rerunfailures ~= 12.0
 requests ~= 2.31
