@@ -7,7 +7,7 @@ from infrahouse_core.logging import setup_logging
 
 DEFAULT_PROGRESS_INTERVAL = 10
 TEST_TIMEOUT = 3600
-UBUNTU_CODENAME = "jammy"
+UBUNTU_CODENAME = "noble"
 
 LOG = logging.getLogger(__name__)
 TEST_ZONE = "ci-cd.infrahouse.com"
