@@ -1,6 +1,6 @@
 import json
 from pprint import pformat
-from os import path as osp
+from os import path as osp, remove
 from tempfile import NamedTemporaryFile
 from textwrap import dedent
 
