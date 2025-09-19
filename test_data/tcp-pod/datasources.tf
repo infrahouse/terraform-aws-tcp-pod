@@ -1,9 +1,10 @@
+
 data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-${var.ubuntu_codename}-*"]
+    values = [local.ami_name_pattern_pro]
   }
 
   filter {

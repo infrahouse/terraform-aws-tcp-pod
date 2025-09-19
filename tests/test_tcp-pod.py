@@ -1,11 +1,11 @@
 import json
 from pprint import pformat
-from os import path as osp
+from os import path as osp, remove
 from tempfile import NamedTemporaryFile
 from textwrap import dedent
 
 import pytest
-from infrahouse_toolkit.terraform import terraform_apply
+from pytest_infrahouse import terraform_apply
 from paramiko.client import SSHClient, AutoAddPolicy
 
 from tests.conftest import (
@@ -22,6 +22,9 @@ from tests.conftest import (
     "lb_subnets,expected_scheme",
     [("subnet_public_ids", "internet-facing"), ("subnet_private_ids", "internal")],
 )
+@pytest.mark.parametrize(
+    "aws_provider_version", ["~> 5.31", "~> 6.0"], ids=["aws-5", "aws-6"]
+)
 def test_module(
     service_network,
     ec2_client,
@@ -30,6 +33,7 @@ def test_module(
     autoscaling_client,
     lb_subnets,
     expected_scheme,
+    aws_provider_version,
     keep_after,
     aws_region,
 ):
@@ -37,6 +41,41 @@ def test_module(
     lb_subnet_ids = service_network[lb_subnets]["value"]
 
     terraform_dir = "test_data/tcp-pod"
+    # Clean up any existing Terraform state to ensure clean test
+    import shutil
+
+    state_files = [
+        osp.join(terraform_dir, ".terraform"),
+        osp.join(terraform_dir, ".terraform.lock.hcl"),
+    ]
+
+    for state_file in state_files:
+        try:
+            if osp.isdir(state_file):
+                shutil.rmtree(state_file)
+            elif osp.isfile(state_file):
+                remove(state_file)
+        except FileNotFoundError:
+            # File was already removed by another process
+            pass
+
+    # Update terraform.tf with the specified AWS provider version
+    terraform_tf_content = dedent(
+        f"""
+        terraform {{
+          required_providers {{
+            aws = {{
+              source  = "hashicorp/aws"
+              version = "{aws_provider_version}"
+            }}
+          }}
+        }}
+        """
+    )
+
+    with open(osp.join(terraform_dir, "terraform.tf"), "w") as fp:
+        fp.write(terraform_tf_content)
+
     instance_name = "jumphost"
 
     with open(osp.join(terraform_dir, "terraform.tfvars"), "w") as fp:
