@@ -124,7 +124,7 @@ def test_module(
             for a in response["ResourceRecordSets"]
             if a["Type"] in ["CNAME", "A"]
         ]
-        for record in ["jumphost"]:
+        for record in ["jumphost-tcp-pod"]:
             assert (
                 "%s.%s." % (record, TEST_ZONE) in records
             ), "Record %s is missing in %s: %s" % (
