@@ -11,6 +11,10 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
+TEST_REGION="us-west-2"
+TEST_ROLE="arn:aws:iam::303467602807:role/tcp-pod-tester"
+
+
 help: install-hooks
 	@python -c "$$PRINT_HELP_PYSCRIPT" < Makefile
 
@@ -26,6 +30,23 @@ install-hooks:  ## Install repo hooks
 test:  ## Run tests on the module
 	pytest -xvvs tests/
 
+
+.PHONY: test-keep
+test-keep:  ## Run a test and keep resources
+	pytest -xvvs \
+		--aws-region=${TEST_REGION} \
+		--test-role-arn=${TEST_ROLE} \
+		--keep-after \
+		-k  "internal and aws-6" \
+		tests/test_tcp-pod.py
+
+.PHONY: test-clean
+test-clean:  ## Run a test and destroy resources
+	pytest -xvvs \
+		--aws-region=${TEST_REGION} \
+		--test-role-arn=${TEST_ROLE} \
+		-k  "internal and aws-6" \
+		tests/test_tcp-pod.py
 
 .PHONY: bootstrap
 bootstrap: ## bootstrap the development environment
