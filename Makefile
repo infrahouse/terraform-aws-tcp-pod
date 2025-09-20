@@ -37,7 +37,7 @@ test-keep:  ## Run a test and keep resources
 		--aws-region=${TEST_REGION} \
 		--test-role-arn=${TEST_ROLE} \
 		--keep-after \
-		-k  "internal and aws-6" \
+		-k  "aws-5-subnet_public_ids-internet-facing" \
 		tests/test_tcp-pod.py
 
 .PHONY: test-clean
@@ -45,7 +45,7 @@ test-clean:  ## Run a test and destroy resources
 	pytest -xvvs \
 		--aws-region=${TEST_REGION} \
 		--test-role-arn=${TEST_ROLE} \
-		-k  "internal and aws-6" \
+		-k  "aws-5-subnet_public_ids-internet-facing" \
 		tests/test_tcp-pod.py
 
 .PHONY: bootstrap

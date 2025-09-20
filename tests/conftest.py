@@ -10,7 +10,6 @@ TEST_TIMEOUT = 3600
 UBUNTU_CODENAME = "noble"
 
 LOG = logging.getLogger(__name__)
-TEST_ZONE = "ci-cd.infrahouse.com"
 TERRAFORM_ROOT_DIR = "test_data"
 
 setup_logging(LOG, debug=True)

@@ -10,7 +10,6 @@ from paramiko.client import SSHClient, AutoAddPolicy
 
 from tests.conftest import (
     LOG,
-    TEST_ZONE,
     UBUNTU_CODENAME,
     TEST_TIMEOUT,
     wait_for_instance_refresh,
@@ -37,6 +36,7 @@ def test_module(
     keep_after,
     aws_region,
     test_role_arn,
+    test_zone_name,
 ):
     subnet_private_ids = service_network["subnet_private_ids"]["value"]
     lb_subnet_ids = service_network[lb_subnets]["value"]
@@ -84,7 +84,7 @@ def test_module(
             dedent(
                 f"""
                 region          = "{aws_region}"
-                dns_zone        = "{TEST_ZONE}"
+                dns_zone        = "{test_zone_name}"
                 ubuntu_codename = "{UBUNTU_CODENAME}"
 
                 lb_subnet_ids       = {json.dumps(lb_subnet_ids)}
@@ -109,9 +109,9 @@ def test_module(
         assert len(tf_output["network_subnet_private_ids"]) == 3
         assert len(tf_output["network_subnet_public_ids"]) == 3
 
-        response = route53_client.list_hosted_zones_by_name(DNSName=TEST_ZONE)
+        response = route53_client.list_hosted_zones_by_name(DNSName=test_zone_name)
         assert len(response["HostedZones"]) > 0, "Zone %s is not hosted by AWS: %s" % (
-            TEST_ZONE,
+            test_zone_name,
             response,
         )
         zone_id = response["HostedZones"][0]["Id"]
@@ -126,10 +126,10 @@ def test_module(
         ]
         for record in ["jumphost-tcp-pod"]:
             assert (
-                "%s.%s." % (record, TEST_ZONE) in records
+                "%s.%s." % (record, test_zone_name) in records
             ), "Record %s is missing in %s: %s" % (
                 record,
-                TEST_ZONE,
+                test_zone_name,
                 pformat(records, indent=4),
             )
 
@@ -193,7 +193,7 @@ def test_module(
                 client = SSHClient()
                 client.set_missing_host_key_policy(AutoAddPolicy())
                 client.connect(
-                    f"jumphost.{TEST_ZONE}",
+                    f"jumphost-tcp-pod.{test_zone_name}",
                     username="ubuntu",
                     key_filename=ssh_key_file.name,
                 )
