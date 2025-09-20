@@ -36,6 +36,7 @@ def test_module(
     aws_provider_version,
     keep_after,
     aws_region,
+    test_role_arn,
 ):
     subnet_private_ids = service_network["subnet_private_ids"]["value"]
     lb_subnet_ids = service_network[lb_subnets]["value"]
@@ -91,6 +92,14 @@ def test_module(
                 """
             )
         )
+        if test_role_arn:
+            fp.write(
+                dedent(
+                    f"""
+                    role_arn      = "{test_role_arn}"
+                    """
+                )
+            )
 
     with terraform_apply(
         terraform_dir,
@@ -124,7 +133,11 @@ def test_module(
                 pformat(records, indent=4),
             )
 
-        response = elbv2_client.describe_load_balancers()
+        response = elbv2_client.describe_load_balancers(
+            LoadBalancerArns=[
+                tf_output["load_balancer_arn"]["value"],
+            ]
+        )
         LOG.debug("describe_load_balancers(): %s", pformat(response, indent=4))
         assert (
             len(response["LoadBalancers"]) == 1
