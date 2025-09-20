@@ -19,6 +19,7 @@ module "lb" {
     aws.dns = aws
   }
   service_name                 = "jumphost"
+  dns_a_records                = ["jumphost-tcp-pod"]
   subnets                      = var.lb_subnet_ids
   backend_subnets              = var.backend_subnet_ids
   ami                          = data.aws_ami.ubuntu.id
