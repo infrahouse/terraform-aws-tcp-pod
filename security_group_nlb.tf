@@ -54,6 +54,7 @@ resource "aws_vpc_security_group_ingress_rule" "nlb_icmp" {
 
 
 resource "aws_vpc_security_group_egress_rule" "nlb_outgoing" {
+  description       = "Allow all outgoing traffic"
   security_group_id = aws_security_group.nlb.id
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
