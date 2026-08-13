@@ -1,37 +1,102 @@
 # terraform-aws-tcp-pod
 
-The module creates resources to run an TCP service in an autoscaling group.
+[![Need Help?](https://img.shields.io/badge/Need%20Help%3F-Contact%20Us-0066CC)](https://infrahouse.com/contact)
+[![Docs](https://img.shields.io/badge/docs-github.io-blue)](https://infrahouse.github.io/terraform-aws-tcp-pod/)
+[![Registry](https://img.shields.io/badge/Terraform-Registry-purple?logo=terraform)](https://registry.terraform.io/modules/infrahouse/tcp-pod/aws/latest)
+[![Release](https://img.shields.io/github/release/infrahouse/terraform-aws-tcp-pod.svg)](https://github.com/infrahouse/terraform-aws-tcp-pod/releases/latest)
+[![Security](https://img.shields.io/github/actions/workflow/status/infrahouse/terraform-aws-tcp-pod/vuln-scanner-pr.yml?label=Security)](https://github.com/infrahouse/terraform-aws-tcp-pod/actions/workflows/vuln-scanner-pr.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
+[![AWS EC2](https://img.shields.io/badge/AWS-EC2-orange?logo=amazonec2)](https://aws.amazon.com/ec2/)
+[![AWS Auto Scaling](https://img.shields.io/badge/AWS-Auto%20Scaling-orange?logo=amazonec2)](https://aws.amazon.com/autoscaling/)
+[![AWS NLB](https://img.shields.io/badge/AWS-Network%20Load%20Balancer-orange)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
+[![AWS Route 53](https://img.shields.io/badge/AWS-Route%2053-orange?logo=amazonroute53)](https://aws.amazon.com/route53/)
 
-> **Note**: The module separates the main aws provider and a provider for
-> Route53 resources. If you don't need to separate them, just pass the same provider for `aws` and `aws.dns`
-> ```hcl
-> providers = {
->   aws     = aws
->   aws.dns = aws
-> }
-> ```
+This Terraform module runs a TCP service in an EC2 Auto Scaling Group behind a Network Load Balancer,
+with Route53 alias records pointing at the NLB. Use it for any plain TCP protocol — SSH jumphosts,
+databases, mail servers, message brokers — anything that isn't HTTP
+(for HTTP services, see [terraform-aws-website-pod](https://github.com/infrahouse/terraform-aws-website-pod)).
+
+## Why This Module?
+
+Most load balancer modules focus on HTTP services behind an Application Load Balancer.
+This module is built for TCP services and packages everything a production service needs:
+
+- **Complete service pod**: NLB, listener, target group, Auto Scaling Group, launch template,
+  security groups, instance profile, SSH key pair, and DNS records — in one module.
+- **Split-account DNS**: a dedicated `aws.dns` provider alias lets Route53 records live
+  in a different AWS account than the service — or pass the same provider for both.
+- **Scheme inferred, not configured**: public load balancer subnets produce an internet-facing NLB,
+  private subnets an internal one. No extra knob to get wrong.
+- **Safe rolling updates**: tag changes trigger a rolling instance refresh with configurable
+  healthy percentage limits.
+- **ECS-ready**: the target group can be detached from the ASG so ECS can register targets itself.
+- **Compliance built-in**: resources carry Vanta compliance tags and resource provenance tags.
+- **Tested against real AWS**: the integration test suite deploys the module and connects
+  through the NLB before a release is cut.
+
+## Features
+
+- Network Load Balancer with a TCP listener and configurable health checks
+- EC2 Auto Scaling Group with CPU target-tracking autoscaling
+- Route53 alias A records for the service (one or many)
+- Internet-facing or internal scheme inferred from subnet configuration
+- Security groups for the NLB and backend instances following least privilege
+- Optional SSH access rule and generated fallback SSH key pair
+- Instance profile with default or caller-supplied IAM permissions
+- Spot instance support with configurable on-demand base capacity
+- Optional ASG lifecycle hooks for launch and termination
+- Optional CloudWatch CPU alarm publishing to an SNS topic
+- Supports AWS provider versions 5 and 6
+
+## Quick Start
+
+```hcl
+module "tcp-pod" {
+  source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
+  version = "0.6.0"
+  providers = {
+    aws     = aws
+    aws.dns = aws
+  }
+
+  # Required
+  service_name      = "jumphost"
+  environment       = "production"
+  ami               = data.aws_ami.ubuntu.id
+  subnets           = module.vpc.subnet_public_ids  # public subnets => internet-facing NLB
+  backend_subnets   = module.vpc.subnet_private_ids
+  nlb_listener_port = 22
+  zone_id           = data.aws_route53_zone.example.zone_id
+  key_pair_name     = aws_key_pair.deployer.key_name
+  userdata          = module.cloud-init.userdata
+
+  # Optional customization
+  instance_type = "t3.micro"
+  dns_a_records = ["jumphost"]
+}
+```
+
+> **Note**: The module separates the main `aws` provider and a provider for
+> Route53 resources (`aws.dns`), so DNS records can be managed in a different AWS account.
+> If you don't need to separate them, pass the same provider for both.
+
+## Documentation
+
+- [Getting Started](https://infrahouse.github.io/terraform-aws-tcp-pod/getting-started/) —
+  Prerequisites and first deployment
+- [Architecture](https://infrahouse.github.io/terraform-aws-tcp-pod/architecture/) — How the module works
+- [Configuration](https://infrahouse.github.io/terraform-aws-tcp-pod/configuration/) — All available options
+- [Examples](https://infrahouse.github.io/terraform-aws-tcp-pod/examples/) — Common use cases
+- [Troubleshooting](https://infrahouse.github.io/terraform-aws-tcp-pod/troubleshooting/) —
+  Common issues and solutions
+- [Changelog](https://infrahouse.github.io/terraform-aws-tcp-pod/changelog/) — Release history
 
 ## Usage
 
-```hcl
-module "tcp" {
-  providers = {
-    aws     = aws.aws-uw1
-    aws.dns = aws.aws-uw1
-  }
-  source                = "infrahouse/tcp-pod/aws"
-  version               = "~> 0.1"
-  environment           = var.environment
-  ami                   = data.aws_ami.ubuntu_22.image_id
-  backend_subnets       = module.website-vpc.subnet_private_ids
-  zone_id               = "Z07662251LH3YRF2ERM3G"
-  dns_a_records         = ["", "www"]
-  key_pair_name         = data.aws_key_pair.aleks.key_name
-  subnets               = module.website-vpc.subnet_public_ids
-  userdata              = module.webserver_userdata.userdata
-}
-```
+The auto-generated documentation below lists module requirements, all input variables, and outputs.
+
+<!-- BEGIN_TF_DOCS -->
 
 ## Requirements
 
@@ -54,7 +119,7 @@ module "tcp" {
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_instance_profile"></a> [instance\_profile](#module\_instance\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | 1.6.1 |
+| <a name="module_instance_profile"></a> [instance\_profile](#module\_instance\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | 1.9.0 |
 
 ## Resources
 
@@ -170,3 +235,21 @@ module "tcp" {
 | <a name="output_load_balancer_dns_name"></a> [load\_balancer\_dns\_name](#output\_load\_balancer\_dns\_name) | Load balancer DNS name. |
 | <a name="output_target_group_arn"></a> [target\_group\_arn](#output\_target\_group\_arn) | Target group ARN that listens to the service port. |
 | <a name="output_zone_id"></a> [zone\_id](#output\_zone\_id) | Zone id where A records are created for the service. |
+<!-- END_TF_DOCS -->
+
+## Examples
+
+Working examples live in the [examples/](examples/) directory:
+
+- [examples/jumphost](examples/jumphost) — an SSH jumphost behind an internet-facing NLB
+
+The [test_data/tcp-pod](test_data/tcp-pod) root module used by the integration tests
+is another complete, working configuration.
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## License
+
+This module is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.

@@ -1,0 +1,45 @@
+# Checkov configuration for terraform-aws-tcp-pod module
+
+framework:
+  - terraform
+
+skip-path:
+  - test_data
+  - examples
+
+skip-check:
+  # CKV_TF_1: Module sources use version pins from private registry (registry.infrahouse.com)
+  # InfraHouse standard: exact version pinning from registry.infrahouse.com,
+  # which provides better maintainability than commit hash pinning.
+  # Renovate manages version updates via individual PRs for explicit review.
+  - CKV_TF_1
+
+  # CKV_TF_2: Module sources use version pins from private registry
+  # Same as CKV_TF_1 - Renovate handles module version updates.
+  - CKV_TF_2
+
+  # CKV_AWS_277: ICMP ingress from 0.0.0.0/0 on the NLB and backend security groups.
+  # InfraHouse standard allows ICMP for path MTU discovery and network
+  # troubleshooting. Backend instances live behind the NLB in private subnets.
+  - CKV_AWS_277
+
+  # CKV_AWS_91: NLB access logging.
+  # NLB access logs capture TLS listeners only; this module serves plain TCP
+  # listeners, so enabling access logging would record nothing.
+  - CKV_AWS_91
+
+  # CKV_AWS_150: Load balancer deletion protection.
+  # Exposed as the enable_deletion_protection variable. The default is false
+  # on purpose: integration tests and short-lived environments must be able
+  # to destroy the NLB.
+  - CKV_AWS_150
+
+  # CKV_AWS_152: Cross-zone load balancing.
+  # Left at the NLB default (disabled) because enabling it changes
+  # cross-AZ data transfer costs. Each backend subnet runs at least one
+  # instance (ASG min size = number of backend subnets), so every AZ has
+  # a local target.
+  - CKV_AWS_152
+
+compact: true
+quiet: false

@@ -61,8 +61,7 @@ def test_module(
             pass
 
     # Update terraform.tf with the specified AWS provider version
-    terraform_tf_content = dedent(
-        f"""
+    terraform_tf_content = dedent(f"""
         terraform {{
           required_providers {{
             aws = {{
@@ -71,8 +70,7 @@ def test_module(
             }}
           }}
         }}
-        """
-    )
+        """)
 
     with open(osp.join(terraform_dir, "terraform.tf"), "w") as fp:
         fp.write(terraform_tf_content)
@@ -80,35 +78,24 @@ def test_module(
     instance_name = "jumphost"
 
     with open(osp.join(terraform_dir, "terraform.tfvars"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""
+        fp.write(dedent(f"""
                 region          = "{aws_region}"
                 dns_zone        = "{test_zone_name}"
                 ubuntu_codename = "{UBUNTU_CODENAME}"
 
                 lb_subnet_ids       = {json.dumps(lb_subnet_ids)}
                 backend_subnet_ids  = {json.dumps(subnet_private_ids)}
-                """
-            )
-        )
+                """))
         if test_role_arn:
-            fp.write(
-                dedent(
-                    f"""
+            fp.write(dedent(f"""
                     role_arn      = "{test_role_arn}"
-                    """
-                )
-            )
+                    """))
 
     with terraform_apply(
         terraform_dir,
         destroy_after=not keep_after,
         json_output=True,
     ) as tf_output:
-        assert len(tf_output["network_subnet_private_ids"]) == 3
-        assert len(tf_output["network_subnet_public_ids"]) == 3
-
         response = route53_client.list_hosted_zones_by_name(DNSName=test_zone_name)
         assert len(response["HostedZones"]) > 0, "Zone %s is not hosted by AWS: %s" % (
             test_zone_name,
@@ -144,9 +131,14 @@ def test_module(
         ), "Unexpected number of Load Balancer: %s" % pformat(response, indent=4)
 
         assert response["LoadBalancers"][0]["Scheme"] == expected_scheme
-        assert (
-            len(response["LoadBalancers"][0]["AvailabilityZones"]) == 3
-        ), "Unexpected number of Availability Zones: %s" % pformat(response, indent=4)
+        lb_subnets_attached = {
+            az["SubnetId"] for az in response["LoadBalancers"][0]["AvailabilityZones"]
+        }
+        assert lb_subnets_attached == set(
+            lb_subnet_ids
+        ), "Load balancer is not attached to the expected subnets: %s" % pformat(
+            response, indent=4
+        )
 
         lb_arn = response["LoadBalancers"][0]["LoadBalancerArn"]
         response = elbv2_client.describe_listeners(
@@ -184,7 +176,6 @@ def test_module(
                 healthy_count += 1
         assert healthy_count >= len(subnet_private_ids)
 
-        assert len(tf_output["network_subnet_private_ids"]) == 3
         if expected_scheme == "internet-facing":
             with NamedTemporaryFile("w") as ssh_key_file:
                 ssh_key_file.write(tf_output["ssh_private_key"]["value"])
