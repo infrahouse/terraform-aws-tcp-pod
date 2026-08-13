@@ -61,8 +61,7 @@ def test_module(
             pass
 
     # Update terraform.tf with the specified AWS provider version
-    terraform_tf_content = dedent(
-        f"""
+    terraform_tf_content = dedent(f"""
         terraform {{
           required_providers {{
             aws = {{
@@ -71,8 +70,7 @@ def test_module(
             }}
           }}
         }}
-        """
-    )
+        """)
 
     with open(osp.join(terraform_dir, "terraform.tf"), "w") as fp:
         fp.write(terraform_tf_content)
@@ -80,26 +78,18 @@ def test_module(
     instance_name = "jumphost"
 
     with open(osp.join(terraform_dir, "terraform.tfvars"), "w") as fp:
-        fp.write(
-            dedent(
-                f"""
+        fp.write(dedent(f"""
                 region          = "{aws_region}"
                 dns_zone        = "{test_zone_name}"
                 ubuntu_codename = "{UBUNTU_CODENAME}"
 
                 lb_subnet_ids       = {json.dumps(lb_subnet_ids)}
                 backend_subnet_ids  = {json.dumps(subnet_private_ids)}
-                """
-            )
-        )
+                """))
         if test_role_arn:
-            fp.write(
-                dedent(
-                    f"""
+            fp.write(dedent(f"""
                     role_arn      = "{test_role_arn}"
-                    """
-                )
-            )
+                    """))
 
     with terraform_apply(
         terraform_dir,
