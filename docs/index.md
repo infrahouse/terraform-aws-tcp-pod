@@ -35,7 +35,7 @@ This module is built for TCP services and packages everything a production servi
 - Spot instance support with configurable on-demand base capacity
 - Optional ASG lifecycle hooks for launch and termination
 - Optional CloudWatch CPU alarm publishing to an SNS topic
-- Supports AWS provider versions 5 and 6
+- Supports AWS provider version 6
 
 ## Quick Start
 

@@ -21,9 +21,7 @@ from tests.conftest import (
     "lb_subnets,expected_scheme",
     [("subnet_public_ids", "internet-facing"), ("subnet_private_ids", "internal")],
 )
-@pytest.mark.parametrize(
-    "aws_provider_version", ["~> 5.31", "~> 6.0"], ids=["aws-5", "aws-6"]
-)
+@pytest.mark.parametrize("aws_provider_version", ["~> 6.0"], ids=["aws-6"])
 def test_module(
     service_network,
     ec2_client,
