@@ -114,7 +114,7 @@ instance-type-diverse subnets/AZs, or raise `on_demand_base_capacity`.
 
 ## Provider Version Conflicts
 
-The module supports AWS provider `>= 5.11, < 7.0`. If your root module pins an
+The module supports AWS provider `>= 6.0, < 7.0`. If your root module pins an
 incompatible version, `terraform init` fails with a constraint error. Align the root
 module's `required_providers` with the supported range.
 
