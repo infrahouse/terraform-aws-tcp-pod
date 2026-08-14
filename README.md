@@ -54,7 +54,7 @@ This module is built for TCP services and packages everything a production servi
 ```hcl
 module "tcp-pod" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "0.6.0"
+  version = "1.0.0"
   providers = {
     aws     = aws
     aws.dns = aws

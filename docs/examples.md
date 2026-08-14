@@ -13,7 +13,7 @@ The NLB lives in public subnets (internet-facing), instances in private subnets:
 ```hcl
 module "jumphost" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "0.6.0"
+  version = "1.0.0"
   providers = {
     aws     = aws
     aws.dns = aws
@@ -41,7 +41,7 @@ no other changes needed:
 ```hcl
 module "postgres-proxy" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "0.6.0"
+  version = "1.0.0"
   providers = {
     aws     = aws
     aws.dns = aws
@@ -79,7 +79,7 @@ provider "aws" {
 
 module "tcp-pod" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "0.6.0"
+  version = "1.0.0"
   providers = {
     aws     = aws
     aws.dns = aws.dns
@@ -125,7 +125,7 @@ Let the module provide NLB + ASG capacity while ECS registers targets itself:
 ```hcl
 module "ecs-pod" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "0.6.0"
+  version = "1.0.0"
   providers = {
     aws     = aws
     aws.dns = aws

@@ -63,7 +63,7 @@ data "aws_route53_zone" "example" {
 
 module "jumphost" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "0.6.0"
+  version = "1.0.0"
   providers = {
     aws     = aws
     aws.dns = aws
