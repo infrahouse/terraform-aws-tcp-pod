@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-08-14
+
+### Bug Fixes
+
+- New lines
+
+### Documentation
+
+- Implement Terraform Module Requirements
+
+### Miscellaneous Tasks
+
+- Update dependency paramiko to v4 ([#20](https://github.com/infrahouse/terraform-aws-tcp-pod/issues/20))
+- Update terraform registry.infrahouse.com/infrahouse/cloud-init/aws to v2.2.2 ([#21](https://github.com/infrahouse/terraform-aws-tcp-pod/issues/21))
+- Update dependency python to 3.14 ([#22](https://github.com/infrahouse/terraform-aws-tcp-pod/issues/22))
+- Add release and security scanning tooling
+
+### Styling
+
+- Format tests with black
+
+### Testing
+
+- Assert LB subnets instead of a hardcoded AZ count
+
 ## [unreleased]
 
 ### Miscellaneous Tasks

@@ -47,14 +47,14 @@ This module is built for TCP services and packages everything a production servi
 - Spot instance support with configurable on-demand base capacity
 - Optional ASG lifecycle hooks for launch and termination
 - Optional CloudWatch CPU alarm publishing to an SNS topic
-- Supports AWS provider versions 5 and 6
+- Supports AWS provider version 6
 
 ## Quick Start
 
 ```hcl
 module "tcp-pod" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "0.6.0"
+  version = "1.0.0"
   providers = {
     aws     = aws
     aws.dns = aws
@@ -103,15 +103,15 @@ The auto-generated documentation below lists module requirements, all input vari
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.5 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.11, < 7.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.0, < 7.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.11, < 7.0 |
-| <a name="provider_aws.dns"></a> [aws.dns](#provider\_aws.dns) | >= 5.11, < 7.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.0, < 7.0 |
+| <a name="provider_aws.dns"></a> [aws.dns](#provider\_aws.dns) | >= 6.0, < 7.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | ~> 3.6 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | n/a |
 
@@ -119,7 +119,7 @@ The auto-generated documentation below lists module requirements, all input vari
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_instance_profile"></a> [instance\_profile](#module\_instance\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | 1.9.0 |
+| <a name="module_instance_profile"></a> [instance\_profile](#module\_instance\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | 2.0.0 |
 
 ## Resources
 
