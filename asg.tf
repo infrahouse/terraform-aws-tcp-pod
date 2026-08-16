@@ -1,16 +1,17 @@
 resource "aws_autoscaling_group" "tcp" {
-  name                      = var.asg_name
-  name_prefix               = var.asg_name == null ? aws_launch_template.tcp.name_prefix : null
-  min_size                  = local.asg_min_size
-  max_size                  = var.asg_max_size != null ? var.asg_max_size : length(var.backend_subnets) + 1
-  min_elb_capacity          = local.min_elb_capacity
-  vpc_zone_identifier       = var.backend_subnets
-  health_check_type         = var.health_check_type
-  wait_for_capacity_timeout = var.wait_for_capacity_timeout
-  max_instance_lifetime     = var.max_instance_lifetime_days * 24 * 3600
-  health_check_grace_period = var.health_check_grace_period
-  protect_from_scale_in     = var.protect_from_scale_in
-  target_group_arns         = var.target_group_type == "instance" && var.attach_target_group_to_asg ? [aws_lb_target_group.tcp.arn] : []
+  name                             = var.asg_name
+  name_prefix                      = var.asg_name == null ? aws_launch_template.tcp.name_prefix : null
+  min_size                         = local.asg_min_size
+  max_size                         = var.asg_max_size != null ? var.asg_max_size : length(var.backend_subnets) + 1
+  min_elb_capacity                 = local.min_elb_capacity
+  vpc_zone_identifier              = var.backend_subnets
+  health_check_type                = var.health_check_type
+  wait_for_capacity_timeout        = var.wait_for_capacity_timeout
+  ignore_failed_scaling_activities = var.ignore_failed_scaling_activities
+  max_instance_lifetime            = var.max_instance_lifetime_days * 24 * 3600
+  health_check_grace_period        = var.health_check_grace_period
+  protect_from_scale_in            = var.protect_from_scale_in
+  target_group_arns                = var.target_group_type == "instance" && var.attach_target_group_to_asg ? [aws_lb_target_group.tcp.arn] : []
   instance_refresh {
     strategy = "Rolling"
     preferences {
