@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-09-08
+
+### Bug Fixes
+
+- New lines
+- Bump cloud-init to 2.4.1 to pin json gem below 3.0
+- Bump cloud-init to 2.4.1 to pin json gem below 3.0
+
+### Features
+
+- Drop AWS provider 5 support
+
+### Miscellaneous Tasks
+
+- Update infrahouse-core and pytest-infrahouse pins
+- Update CHANGELOG for 1.0.0
+- Bump version to 1.0.0
+
 ## [1.0.0] - 2026-08-14
 
 ### Bug Fixes
