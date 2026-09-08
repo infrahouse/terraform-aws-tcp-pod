@@ -30,7 +30,7 @@ resource "aws_key_pair" "jumphost" {
 
 module "jumphost-cloud-init" {
   source  = "registry.infrahouse.com/infrahouse/cloud-init/aws"
-  version = "2.2.2"
+  version = "2.4.1"
 
   environment = var.environment
   role        = "jumphost"
