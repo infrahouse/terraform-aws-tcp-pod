@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-09-14
+
+### Features
+
+- Expose load balancer security groups
+
 ## [1.0.1] - 2026-09-08
 
 ### Bug Fixes
