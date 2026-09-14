@@ -38,7 +38,7 @@ module "jumphost-cloud-init" {
 
 module "jumphost" {
   source  = "registry.infrahouse.com/infrahouse/tcp-pod/aws"
-  version = "1.1.0"
+  version = "1.2.0"
   providers = {
     aws     = aws
     aws.dns = aws
