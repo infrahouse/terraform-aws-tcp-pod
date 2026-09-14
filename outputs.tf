@@ -28,6 +28,11 @@ output "load_balancer_dns_name" {
   value       = aws_lb.tcp.dns_name
 }
 
+output "load_balancer_security_groups" {
+  description = "Security groups associated with the load balancer."
+  value       = [aws_security_group.nlb.id]
+}
+
 output "target_group_arn" {
   description = "Target group ARN that listens to the service port."
   value       = aws_lb_target_group.tcp.arn

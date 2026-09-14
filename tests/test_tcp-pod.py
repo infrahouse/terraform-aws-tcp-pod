@@ -137,6 +137,10 @@ def test_module(
         ), "Load balancer is not attached to the expected subnets: %s" % pformat(
             response, indent=4
         )
+        assert (
+            response["LoadBalancers"][0]["SecurityGroups"]
+            == tf_output["load_balancer_security_groups"]["value"]
+        ), "Unexpected load balancer security groups: %s" % pformat(response, indent=4)
 
         lb_arn = response["LoadBalancers"][0]["LoadBalancerArn"]
         response = elbv2_client.describe_listeners(
