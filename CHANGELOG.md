@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-09-14
+
+### Features
+
+- Add nlb_ingress_cidr_blocks to restrict NLB listener sources
+
 ## [1.1.0] - 2026-09-14
 
 ### Features
