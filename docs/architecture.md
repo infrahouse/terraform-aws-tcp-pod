@@ -85,7 +85,7 @@ Two security groups implement least-privilege access:
 
 | Rule | Direction | Port | Source/Destination |
 |------|-----------|------|--------------------|
-| User traffic | ingress | `nlb_listener_port` | `0.0.0.0/0` |
+| User traffic | ingress | `nlb_listener_port` | `nlb_ingress_cidr_blocks` (default `0.0.0.0/0`), one rule per CIDR |
 | ICMP | ingress | all types | `0.0.0.0/0` |
 | All traffic | egress | all | `0.0.0.0/0` |
 

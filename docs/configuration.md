@@ -130,8 +130,16 @@ guaranteed on-demand base:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `nlb_ingress_cidr_blocks` | `["0.0.0.0/0"]` | IPv4 CIDR blocks allowed to connect to `nlb_listener_port`. |
 | `ssh_cidr_block` | `null` | Extra CIDR allowed to SSH to the backends (e.g. an office range). |
 | `extra_security_groups_backend` | `[]` | Additional security group ids for the instances. |
+
+The NLB security group gets one ingress rule per entry in `nlb_ingress_cidr_blocks`. To
+accept connections only from inside the VPC and an office range:
+
+```hcl
+  nlb_ingress_cidr_blocks = ["10.0.0.0/16", "203.0.113.0/24"]
+```
 
 ## IAM
 
