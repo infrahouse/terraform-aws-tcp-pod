@@ -26,6 +26,10 @@ output "load_balancer_arn" {
   value = module.lb.load_balancer_arn
 }
 
+output "load_balancer_security_groups" {
+  value = module.lb.load_balancer_security_groups
+}
+
 output "ssh_private_key" {
   value     = tls_private_key.rsa.private_key_openssh
   sensitive = true
