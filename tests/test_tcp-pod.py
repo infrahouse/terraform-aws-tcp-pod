@@ -74,6 +74,9 @@ def test_module(
         fp.write(terraform_tf_content)
 
     instance_name = "jumphost"
+    # 0.0.0.0/0 keeps the SSH-through-NLB check below working; the second block
+    # checks that the module creates one ingress rule per CIDR.
+    nlb_ingress_cidr_blocks = ["0.0.0.0/0", "10.0.0.0/8"]
 
     with open(osp.join(terraform_dir, "terraform.tfvars"), "w") as fp:
         fp.write(dedent(f"""
@@ -83,6 +86,8 @@ def test_module(
 
                 lb_subnet_ids       = {json.dumps(lb_subnet_ids)}
                 backend_subnet_ids  = {json.dumps(subnet_private_ids)}
+
+                nlb_ingress_cidr_blocks = {json.dumps(nlb_ingress_cidr_blocks)}
                 """))
         if test_role_arn:
             fp.write(dedent(f"""
@@ -143,6 +148,27 @@ def test_module(
         ), "Unexpected load balancer security groups: %s" % pformat(response, indent=4)
 
         lb_arn = response["LoadBalancers"][0]["LoadBalancerArn"]
+
+        nlb_security_group_id = tf_output["load_balancer_security_groups"]["value"][0]
+        response = ec2_client.describe_security_group_rules(
+            Filters=[{"Name": "group-id", "Values": [nlb_security_group_id]}]
+        )
+        LOG.debug(
+            "describe_security_group_rules(%s): %s",
+            nlb_security_group_id,
+            pformat(response, indent=4),
+        )
+        listener_port_cidrs = [
+            rule["CidrIpv4"]
+            for rule in response["SecurityGroupRules"]
+            if not rule["IsEgress"]
+            and rule["IpProtocol"] == "tcp"
+            and rule["FromPort"] == 22
+        ]
+        assert sorted(listener_port_cidrs) == sorted(
+            nlb_ingress_cidr_blocks
+        ), "Unexpected NLB listener ingress rules: %s" % pformat(response, indent=4)
+
         response = elbv2_client.describe_listeners(
             LoadBalancerArn=lb_arn,
         )

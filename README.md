@@ -195,6 +195,7 @@ The auto-generated documentation below lists module requirements, all input vari
 | <a name="input_nlb_healthcheck_timeout"></a> [nlb\_healthcheck\_timeout](#input\_nlb\_healthcheck\_timeout) | Number of seconds to timeout a check | `number` | `10` | no |
 | <a name="input_nlb_healthcheck_uhealthy_threshold"></a> [nlb\_healthcheck\_uhealthy\_threshold](#input\_nlb\_healthcheck\_uhealthy\_threshold) | Number of times the host have to pass the test to be considered UNhealthy | `number` | `2` | no |
 | <a name="input_nlb_idle_timeout"></a> [nlb\_idle\_timeout](#input\_nlb\_idle\_timeout) | The time in seconds that the connection is allowed to be idle. | `number` | `60` | no |
+| <a name="input_nlb_ingress_cidr_blocks"></a> [nlb\_ingress\_cidr\_blocks](#input\_nlb\_ingress\_cidr\_blocks) | List of IPv4 CIDR blocks allowed to connect to the NLB listener port.<br/>Defaults to allow all (0.0.0.0/0). | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
 | <a name="input_nlb_listener_port"></a> [nlb\_listener\_port](#input\_nlb\_listener\_port) | TCP port that a load balancer listens. | `number` | n/a | yes |
 | <a name="input_nlb_name_prefix"></a> [nlb\_name\_prefix](#input\_nlb\_name\_prefix) | Name prefix for the load balancer | `string` | `null` | no |
 | <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | If specified, the ASG will request spot instances and this will be the minimal number of on-demand instances. | `number` | `null` | no |

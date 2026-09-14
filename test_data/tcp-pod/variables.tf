@@ -9,3 +9,4 @@ variable "asg_name" { default = null }
 variable "backend_subnet_ids" {}
 variable "lb_subnet_ids" {}
 variable "instance_role_name" { default = null }
+variable "nlb_ingress_cidr_blocks" {}

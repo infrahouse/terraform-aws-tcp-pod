@@ -24,6 +24,7 @@ module "lb" {
   backend_subnets              = var.backend_subnet_ids
   ami                          = data.aws_ami.ubuntu.id
   nlb_listener_port            = 22
+  nlb_ingress_cidr_blocks      = var.nlb_ingress_cidr_blocks
   zone_id                      = data.aws_route53_zone.tcp.zone_id
   key_pair_name                = aws_key_pair.test.key_name
   userdata                     = module.jumphost-cloud-init.userdata

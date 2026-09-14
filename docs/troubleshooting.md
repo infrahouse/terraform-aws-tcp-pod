@@ -60,9 +60,10 @@ recreates the load balancer.
    created in the zone `zone_id`; with a split DNS account make sure `aws.dns` points at
    the right one.
 2. **Scheme**: an internal NLB is only reachable from inside the VPC (or peered networks).
-3. **Security groups**: the NLB security group allows `nlb_listener_port` from
-   `0.0.0.0/0`; backends only accept traffic from the NLB security group. If you replaced
-   or added groups via `extra_security_groups_backend`, verify the rules.
+3. **Security groups**: the NLB security group allows `nlb_listener_port` only from
+   `nlb_ingress_cidr_blocks` (default `0.0.0.0/0`), so make sure the client's source address
+   is in one of those ranges. Backends only accept traffic from the NLB security group. If
+   you replaced or added groups via `extra_security_groups_backend`, verify the rules.
 4. **Health**: an NLB only forwards to healthy targets. See the timeout section above.
 5. **Client IP preservation**: NLB target groups with `instance` type preserve the client
    source address. If the service's own firewall (iptables, ufw) filters by source IP,

@@ -40,6 +40,25 @@ variable "nlb_idle_timeout" {
   default     = 60
 }
 
+variable "nlb_ingress_cidr_blocks" {
+  description = <<-EOT
+    List of IPv4 CIDR blocks allowed to connect to the NLB listener port.
+    Defaults to allow all (0.0.0.0/0).
+  EOT
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+
+  validation {
+    condition = alltrue([
+      for cidr in var.nlb_ingress_cidr_blocks : can(cidrnetmask(cidr))
+    ])
+    error_message = <<-EOT
+      nlb_ingress_cidr_blocks must contain only IPv4 CIDR blocks (e.g. "10.0.0.0/16").
+      Got: ${jsonencode(var.nlb_ingress_cidr_blocks)}
+    EOT
+  }
+}
+
 variable "nlb_listener_port" {
   description = "TCP port that a load balancer listens."
   type        = number
