@@ -85,6 +85,7 @@ resource "aws_launch_template" "tcp" {
     ebs {
       volume_size           = var.root_volume_size
       delete_on_termination = true
+      encrypted             = true
     }
   }
   tag_specifications {
