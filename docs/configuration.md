@@ -126,6 +126,8 @@ guaranteed on-demand base:
 | `userdata` | — | Cloud-init payload. |
 | `key_pair_name` | — | SSH key pair (or `null` for a generated one). |
 
+The root EBS volume is always encrypted with the AWS-managed `aws/ebs` key; there is no toggle to disable it.
+
 ## Security
 
 | Variable | Default | Description |
